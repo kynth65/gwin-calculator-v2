@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f5f5f5;
+        color: #111;
+        min-height: 100vh;
+        font-size: 14px;
+      }
+      header {
+        background: #fff;
+        border-bottom: 1px solid #e5e5e5;
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .logo {
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        color: #111;
+      }
+      .logo span {
+        color: #2563eb;
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        height: calc(100vh - 57px);
+      }
+      .catalog {
+        overflow-y: auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .filter-bar {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .filter-chip {
+        padding: 5px 13px;
+        border-radius: 20px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #6b7280;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .filter-chip:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+        background: #eff6ff;
+      }
+      .filter-chip.active {
+        border-color: #2563eb;
+        color: #fff;
+        background: #2563eb;
+      }
+      .section-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #9ca3af;
+        margin: 20px 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-label:first-of-type {
+        margin-top: 0;
+      }
+      .section-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        gap: 8px;
+      }
+      .product-card {
+        background: #fff;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px 14px;
+        cursor: pointer;
+        transition: all 0.15s;
+        position: relative;
+        overflow: hidden;
+      }
+      .product-card:hover {
+        border-color: #2563eb;
+        box-shadow: 0 1px 8px rgba(37, 99, 235, 0.1);
+        transform: translateY(-1px);
+      }
+      .product-card.added {
+        border-color: #2563eb;
+        background: #eff6ff;
+      }
+      .product-card::after {
+        content: attr(data-count);
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.15s;
+      }
+      .product-card.added::after {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .card-type {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+      }
+      .card-type.wmah {
+        color: #059669;
+      }
+      .card-type.condenser {
+        color: #ea580c;
+      }
+      .card-type.bundle {
+        color: #7c3aed;
+      }
+      .card-type.multi-zonecondener {
+        color: #0891b2;
+      }
+      .card-type.multi-zonewmah {
+        color: #059669;
+      }
+      .card-type.multi-zoneslimcassette {
+        color: #d97706;
+      }
+      .card-model {
+        font-size: 12px;
+        font-weight: 500;
+        color: #111;
+        margin-bottom: 6px;
+        line-height: 1.4;
+      }
+      .card-meta {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 8px;
+      }
+      .badge {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: #f3f4f6;
+        color: #6b7280;
+        font-weight: 500;
+      }
+      .card-prices {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        border-top: 1px solid #f3f4f6;
+        padding-top: 8px;
+      }
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+      }
+      .price-label {
+        color: #9ca3af;
+      }
+      .price-cost {
+        color: #111;
+        font-weight: 500;
+      }
+      .price-retail {
+        color: #2563eb;
+        font-weight: 600;
+      }
+      .order-panel {
+        border-left: 1px solid #e5e5e5;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .order-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .order-title {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #6b7280;
+      }
+      .order-items {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 48px 20px;
+        color: #9ca3af;
+        font-size: 13px;
+      }
+      .empty-icon {
+        font-size: 28px;
+        margin-bottom: 10px;
+        opacity: 0.5;
+      }
+      .order-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 7px;
+        background: #fff;
+        animation: slideIn 0.2s ease;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .item-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .item-model {
+        font-size: 12px;
+        font-weight: 600;
+        color: #111;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 3px;
+      }
+      .item-badge {
+        display: inline-block;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 1px 6px;
+        border-radius: 3px;
+        margin-bottom: 5px;
+      }
+      .item-badge.wmah {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .item-badge.condenser {
+        background: #ffedd5;
+        color: #9a3412;
+      }
+      .item-badge.bundle {
+        background: #ede9fe;
+        color: #5b21b6;
+      }
+      .item-badge.multi-zonecondener {
+        background: #cffafe;
+        color: #164e63;
+      }
+      .item-badge.multi-zonewmah {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .item-badge.multi-zoneslimcassette {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .item-prices {
+        display: flex;
+        gap: 10px;
+        margin-top: 2px;
+      }
+      .item-price-pair {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+      .item-price-pair .lbl {
+        font-size: 9px;
+        color: #9ca3af;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .item-price-pair .val {
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .item-price-pair .val.cost {
+        color: #111;
+      }
+      .item-price-pair .val.retail {
+        color: #2563eb;
+      }
+      .qty-ctrl {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .qty-btn {
+        width: 24px;
+        height: 24px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        color: #374151;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.1s;
+        font-family: "Inter", sans-serif;
+      }
+      .qty-btn:first-child {
+        border-radius: 5px 0 0 5px;
+      }
+      .qty-btn:last-child {
+        border-radius: 0 5px 5px 0;
+      }
+      .qty-btn:hover {
+        background: #2563eb;
+        color: #fff;
+        border-color: #2563eb;
+      }
+      .qty-btn.remove:hover {
+        background: #ef4444;
+        border-color: #ef4444;
+        color: #fff;
+      }
+      .qty-val {
+        width: 28px;
+        height: 24px;
+        border-top: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fff;
+        color: #111;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+        line-height: 24px;
+      }
+      .order-totals {
+        border-top: 1px solid #f0f0f0;
+        padding: 14px 20px 18px;
+      }
+      .totals-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      .total-col {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+      }
+      .total-col-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #9ca3af;
+        margin-bottom: 4px;
+      }
+      .total-col-sub {
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 2px;
+      }
+      .total-col-main {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111;
+      }
+      .total-col-main.retail-total {
+        color: #2563eb;
+      }
+      .fee-note {
+        font-size: 10px;
+        color: #6b7280;
+        padding: 6px 10px;
+        background: #f0fdf4;
+        border-radius: 6px;
+        border: 1px solid #bbf7d0;
+        margin-bottom: 10px;
+      }
+      .clear-btn {
+        width: 100%;
+        padding: 9px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        color: #9ca3af;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.15s;
+      }
+      .clear-btn:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+        background: #fff5f5;
+      }
+      .catalog::-webkit-scrollbar,
+      .order-items::-webkit-scrollbar {
+        width: 4px;
+      }
+      .catalog::-webkit-scrollbar-thumb,
+      .order-items::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">GWIN <span>HVAC</span></div>
+    </header>
+    <div class="app">
+      <div class="catalog" id="catalog"></div>
+      <div class="order-panel">
+        <div class="order-header">
+          <div class="order-title">Current Order</div>
+        </div>
+        <div class="order-items" id="order-items">
+          <div class="empty-state">
+            <div class="empty-icon">❄</div>
+            <div>No items yet.<br />Click a product to add.</div>
+          </div>
+        </div>
+        <div class="order-totals" id="order-totals" style="display: none">
+          <div class="totals-grid">
+            <div class="total-col">
+              <div class="total-col-label">At Cost</div>
+              <div
+                class="total-col-sub"
+                id="cost-sub"
+                style="display: none"
+              ></div>
+              <div class="total-col-main" id="val-cost">$0.00</div>
+            </div>
+            <div class="total-col">
+              <div class="total-col-label">Retail</div>
+              <div class="total-col-main retail-total" id="val-retail">
+                $0.00
+              </div>
+            </div>
+          </div>
+          <div class="fee-note" id="fee-note" style="display: none"></div>
+          <button class="clear-btn" onclick="clearOrder()">Clear Order</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const PRODUCTS = [
+        // ── Emperor Air Handlers ──
+        {
+          model: "EMPR09HP115V1R32AH",
+          unit_type: "WMAH",
+          voltage: "115V",
+          btu: "9k",
+          at_cost: 260.0,
+          retail: 598.0,
+        },
+        {
+          model: "EMPR09HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 261.32,
+          retail: 601.04,
+        },
+        {
+          model: "EMPR12HP115V1R32AH",
+          unit_type: "WMAH",
+          voltage: "115V",
+          btu: "12k",
+          at_cost: 264.0,
+          retail: 607.2,
+        },
+        {
+          model: "EMPR12HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 265.9,
+          retail: 611.57,
+        },
+        {
+          model: "EMPR18HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 361.3,
+          retail: 830.99,
+        },
+        {
+          model: "EMPR24HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 425.94,
+          retail: 979.66,
+        },
+        // ── Emperor Condensers ──
+        {
+          model: "EMPR09HP115V1R32AO",
+          unit_type: "Condenser",
+          voltage: "115V",
+          btu: "9k",
+          at_cost: 1387.1,
+          retail: 2151.63,
+        },
+        {
+          model: "EMPR09HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 1318.04,
+          retail: 1993.79,
+        },
+        {
+          model: "EMPR12HP115V1R32AO",
+          unit_type: "Condenser",
+          voltage: "115V",
+          btu: "12k",
+          at_cost: 1389.1,
+          retail: 2156.23,
+        },
+        {
+          model: "EMPR12HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 1327.73,
+          retail: 2015.08,
+        },
+        {
+          model: "EMPR18HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 1510.72,
+          retail: 2435.96,
+        },
+        {
+          model: "EMPR24HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 1639.89,
+          retail: 2733.05,
+        },
+        // ── Emperor Bundles ──
+        {
+          model: "EMPR09HP115V1R32AS",
+          unit_type: "Bundle",
+          voltage: "115V",
+          btu: "9k",
+          at_cost: 1819.0,
+          retail: 3145.0,
+        },
+        {
+          model: "EMPR09HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 1751.26,
+          retail: 2989.2,
+        },
+        {
+          model: "EMPR12HP115V1R32AS",
+          unit_type: "Bundle",
+          voltage: "115V",
+          btu: "12k",
+          at_cost: 1825.0,
+          retail: 3158.8,
+        },
+        {
+          model: "EMPR12HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 1765.53,
+          retail: 3022.02,
+        },
+        {
+          model: "EMPR18HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 2046.62,
+          retail: 3668.53,
+        },
+        {
+          model: "EMPR24HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 2245.23,
+          retail: 4125.33,
+        },
+        // ── King Air Handlers ──
+        {
+          model: "KING09HP115V1R32AH",
+          unit_type: "WMAH",
+          voltage: "115V",
+          btu: "9k",
+          at_cost: 182.58,
+          retail: 419.93,
+        },
+        {
+          model: "KING09HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 182.75,
+          retail: 420.32,
+        },
+        {
+          model: "KING12HP115V1R32AH",
+          unit_type: "WMAH",
+          voltage: "115V",
+          btu: "12k",
+          at_cost: 196.6,
+          retail: 452.18,
+        },
+        {
+          model: "KING12HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 196.6,
+          retail: 452.18,
+        },
+        {
+          model: "KING18HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 283.18,
+          retail: 651.31,
+        },
+        {
+          model: "KING24HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 317.1,
+          retail: 729.33,
+        },
+        {
+          model: "KING30HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "30k",
+          at_cost: 508.29,
+          retail: 1169.07,
+        },
+        {
+          model: "KING36HP230V1R32AH",
+          unit_type: "WMAH",
+          voltage: "230V",
+          btu: "36k",
+          at_cost: 540.14,
+          retail: 1242.32,
+        },
+        // ── King Condensers ──
+        {
+          model: "KING09HP115V1R32AO",
+          unit_type: "Condenser",
+          voltage: "115V",
+          btu: "9k",
+          at_cost: 1182.76,
+          retail: 1681.65,
+        },
+        {
+          model: "KING09HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 1160.88,
+          retail: 1631.32,
+        },
+        {
+          model: "KING12HP115V1R32AO",
+          unit_type: "Condenser",
+          voltage: "115V",
+          btu: "12k",
+          at_cost: 1027.07,
+          retail: 1323.56,
+        },
+        {
+          model: "KING12HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 1184.92,
+          retail: 1686.62,
+        },
+        {
+          model: "KING18HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 1355.71,
+          retail: 2079.43,
+        },
+        {
+          model: "KING24HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 1417.68,
+          retail: 2221.96,
+        },
+        {
+          model: "KING30HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "30k",
+          at_cost: 1751.08,
+          retail: 2988.78,
+        },
+        {
+          model: "KING36HP230V1R32AO",
+          unit_type: "Condenser",
+          voltage: "230V",
+          btu: "36k",
+          at_cost: 1813.51,
+          retail: 3132.37,
+        },
+        // ── King Bundles ──
+        {
+          model: "KING09HP115V1R32AS",
+          unit_type: "Bundle",
+          voltage: "115V",
+          btu: "9k",
+          at_cost: 1537.24,
+          retail: 2496.95,
+        },
+        {
+          model: "KING09HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 1222.6,
+          retail: 1773.28,
+        },
+        {
+          model: "KING12HP115V1R32AS",
+          unit_type: "Bundle",
+          voltage: "115V",
+          btu: "12k",
+          at_cost: 1395.57,
+          retail: 2171.11,
+        },
+        {
+          model: "KING12HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 1553.42,
+          retail: 2534.17,
+        },
+        {
+          model: "KING18HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 1813.49,
+          retail: 3132.33,
+        },
+        {
+          model: "KING24HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 1914.18,
+          retail: 3363.91,
+        },
+        {
+          model: "KING30HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "30k",
+          at_cost: 2359.67,
+          retail: 4388.54,
+        },
+        {
+          model: "KING36HP230V1R32AS",
+          unit_type: "Bundle",
+          voltage: "230V",
+          btu: "36k",
+          at_cost: 2453.95,
+          retail: 4605.39,
+        },
+        // ── Multi-Zone Condensers ──
+        {
+          model: "GMULTI18HP230V1R32AO",
+          unit_type: "Multi-Zone Condenser",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 1628.54,
+          retail: 2706.94,
+        },
+        {
+          model: "GMULTI24HP230V1R32AO",
+          unit_type: "Multi-Zone Condenser",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 2016.54,
+          retail: 3599.34,
+        },
+        {
+          model: "GMULTI30HP230V1R32AO",
+          unit_type: "Multi-Zone Condenser",
+          voltage: "230V",
+          btu: "30k",
+          at_cost: 2062.42,
+          retail: 3704.87,
+        },
+        {
+          model: "GMULTI36HP230V1R32AO",
+          unit_type: "Multi-Zone Condenser",
+          voltage: "230V",
+          btu: "36k",
+          at_cost: 2514.56,
+          retail: 4744.79,
+        },
+        {
+          model: "GMULTI42HP230V1R32AO",
+          unit_type: "Multi-Zone Condenser",
+          voltage: "230V",
+          btu: "42k",
+          at_cost: 2619.41,
+          retail: 4985.94,
+        },
+        {
+          model: "GMULTI48HP230V1R32AO",
+          unit_type: "Multi-Zone Condenser",
+          voltage: "230V",
+          btu: "48k",
+          at_cost: 2754.76,
+          retail: 5297.25,
+        },
+        {
+          model: "GMULTI60HP230V1R32AO",
+          unit_type: "Multi-Zone Condenser",
+          voltage: "230V",
+          btu: "60k",
+          at_cost: 3198.46,
+          retail: 6317.76,
+        },
+        // ── Multi-Zone Slim Cassettes ──
+        {
+          model: "GWIN09HP230V1R32AC",
+          unit_type: "Slim Cassette",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 465.4,
+          retail: 1070.42,
+        },
+        {
+          model: "GWIN12HP230V1R32AC",
+          unit_type: "Slim Cassette",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 484.54,
+          retail: 1114.44,
+        },
+        {
+          model: "GWIN20HP230V1R32AC",
+          unit_type: "Slim Cassette",
+          voltage: "230V",
+          btu: "20k",
+          at_cost: 494.46,
+          retail: 1137.26,
+        },
+      ];
+
+      const INSTALL_FEE = 144;
+      let order = {};
+      let activeFilters = { series: "all", type: "all" };
+
+      // CSS class key for unit_type
+      function typeClass(unit_type) {
+        return unit_type.toLowerCase().replace(/[\s-]/g, "");
+      }
+
+      function renderCatalog() {
+        const catalog = document.getElementById("catalog");
+        const sections = [
+          {
+            label: "Emperor — Air Handlers",
+            f: (p) => p.unit_type === "WMAH" && p.model.startsWith("EMPR"),
+          },
+          {
+            label: "Emperor — Condensers",
+            f: (p) => p.unit_type === "Condenser" && p.model.startsWith("EMPR"),
+          },
+          {
+            label: "Emperor — Bundles",
+            f: (p) => p.unit_type === "Bundle" && p.model.startsWith("EMPR"),
+          },
+          {
+            label: "King — Air Handlers",
+            f: (p) => p.unit_type === "WMAH" && p.model.startsWith("KING"),
+          },
+          {
+            label: "King — Condensers",
+            f: (p) => p.unit_type === "Condenser" && p.model.startsWith("KING"),
+          },
+          {
+            label: "King — Bundles",
+            f: (p) => p.unit_type === "Bundle" && p.model.startsWith("KING"),
+          },
+          {
+            label: "Multi-Zone — Condensers",
+            f: (p) => p.unit_type === "Multi-Zone Condenser",
+          },
+          {
+            label: "Multi-Zone — Slim Cassettes",
+            f: (p) => p.unit_type === "Slim Cassette",
+          },
+        ];
+
+        // Series filter helpers
+        const seriesMatch = (p) => {
+          if (activeFilters.series === "empr")
+            return p.model.startsWith("EMPR");
+          if (activeFilters.series === "king")
+            return p.model.startsWith("KING");
+          if (activeFilters.series === "multi")
+            return p.model.startsWith("GMULTI") || p.model.startsWith("GWIN");
+          return true;
+        };
+
+        // Type filter helpers
+        const typeMatch = (p) => {
+          if (activeFilters.type === "WMAH") return p.unit_type === "WMAH";
+          if (activeFilters.type === "Condenser")
+            return (
+              p.unit_type === "Condenser" ||
+              p.unit_type === "Multi-Zone Condenser"
+            );
+          if (activeFilters.type === "Bundle") return p.unit_type === "Bundle";
+          if (activeFilters.type === "Cassette")
+            return p.unit_type === "Slim Cassette";
+          return true;
+        };
+
+        let html = `<div class="filter-bar">
+  <button class="filter-chip ${activeFilters.series === "all" ? "active" : ""}" onclick="setFilter('series','all')">All Series</button>
+  <button class="filter-chip ${activeFilters.series === "empr" ? "active" : ""}" onclick="setFilter('series','empr')">Emperor</button>
+  <button class="filter-chip ${activeFilters.series === "king" ? "active" : ""}" onclick="setFilter('series','king')">King</button>
+  <button class="filter-chip ${activeFilters.series === "multi" ? "active" : ""}" onclick="setFilter('series','multi')">Multi-Zone</button>
+  <button class="filter-chip ${activeFilters.type === "all" ? "active" : ""}" onclick="setFilter('type','all')">All Types</button>
+  <button class="filter-chip ${activeFilters.type === "WMAH" ? "active" : ""}" onclick="setFilter('type','WMAH')">Air Handlers</button>
+  <button class="filter-chip ${activeFilters.type === "Condenser" ? "active" : ""}" onclick="setFilter('type','Condenser')">Condensers</button>
+  <button class="filter-chip ${activeFilters.type === "Bundle" ? "active" : ""}" onclick="setFilter('type','Bundle')">Bundles</button>
+  <button class="filter-chip ${activeFilters.type === "Cassette" ? "active" : ""}" onclick="setFilter('type','Cassette')">Cassettes</button>
+</div>`;
+
+        sections.forEach(({ label, f }) => {
+          let products = PRODUCTS.filter(f)
+            .filter(seriesMatch)
+            .filter(typeMatch);
+          if (!products.length) return;
+          html += `<div class="section-label">${label}</div><div class="product-grid">`;
+          products.forEach((p) => {
+            const qty = order[p.model] ? order[p.model].qty : 0;
+            const tc = typeClass(p.unit_type);
+            html += `<div class="product-card ${qty > 0 ? "added" : ""}" data-model="${p.model}" data-count="${qty > 0 ? qty : ""}" onclick="addToOrder('${p.model}',event)">
+  <div class="card-type ${tc}">${p.unit_type}</div>
+  <div class="card-model">${p.model}</div>
+  <div class="card-meta"><span class="badge">${p.btu}</span><span class="badge">${p.voltage}</span></div>
+  <div class="card-prices">
+    <div class="price-row"><span class="price-label">At Cost</span><span class="price-cost">$${p.at_cost.toFixed(2)}</span></div>
+    <div class="price-row"><span class="price-label">Retail</span><span class="price-retail">$${p.retail.toFixed(2)}</span></div>
+  </div>
+</div>`;
+          });
+          html += `</div>`;
+        });
+        catalog.innerHTML = html;
+      }
+
+      function setFilter(k, v) {
+        activeFilters[k] = v;
+        renderCatalog();
+      }
+
+      function addToOrder(modelId, event) {
+        const p = PRODUCTS.find((x) => x.model === modelId);
+        if (!p) return;
+        if (order[modelId]) order[modelId].qty++;
+        else order[modelId] = { product: p, qty: 1 };
+        const card = event.currentTarget;
+        const r = document.createElement("span");
+        r.style.cssText =
+          "position:absolute;border-radius:50%;background:rgba(37,99,235,0.2);transform:scale(0);animation:ripple 0.4s ease-out;pointer-events:none";
+        const rect = card.getBoundingClientRect(),
+          size = Math.max(rect.width, rect.height);
+        r.style.width = r.style.height = size + "px";
+        r.style.left = event.clientX - rect.left - size / 2 + "px";
+        r.style.top = event.clientY - rect.top - size / 2 + "px";
+        if (!document.getElementById("ripple-style")) {
+          const s = document.createElement("style");
+          s.id = "ripple-style";
+          s.textContent = "@keyframes ripple{to{transform:scale(4);opacity:0}}";
+          document.head.appendChild(s);
+        }
+        card.appendChild(r);
+        setTimeout(() => r.remove(), 400);
+        renderCatalog();
+        renderOrder();
+      }
+
+      function changeQty(modelId, delta) {
+        if (!order[modelId]) return;
+        order[modelId].qty += delta;
+        if (order[modelId].qty <= 0) delete order[modelId];
+        renderCatalog();
+        renderOrder();
+      }
+
+      function clearOrder() {
+        order = {};
+        renderCatalog();
+        renderOrder();
+      }
+
+      function renderOrder() {
+        const container = document.getElementById("order-items");
+        const totalsEl = document.getElementById("order-totals");
+        const items = Object.values(order);
+        if (!items.length) {
+          container.innerHTML = `<div class="empty-state"><div class="empty-icon">❄</div><div>No items yet.<br>Click a product to add.</div></div>`;
+          totalsEl.style.display = "none";
+          return;
+        }
+        let costSubtotal = 0,
+          retailSubtotal = 0,
+          wmahCount = 0,
+          html = "";
+        items.forEach(({ product, qty }) => {
+          costSubtotal += product.at_cost * qty;
+          retailSubtotal += product.retail * qty;
+          // Air handlers and cassettes both carry the install fee logic for WMAH
+          if (product.unit_type === "WMAH") wmahCount += qty;
+          const tc = typeClass(product.unit_type);
+          html += `<div class="order-item">
+  <div class="item-info">
+    <div class="item-model">${product.model}</div>
+    <span class="item-badge ${tc}">${product.unit_type}</span>
+    <div class="item-prices">
+      <div class="item-price-pair"><div class="lbl">At Cost</div><div class="val cost">$${(product.at_cost * qty).toFixed(2)}</div></div>
+      <div class="item-price-pair"><div class="lbl">Retail</div><div class="val retail">$${(product.retail * qty).toFixed(2)}</div></div>
+    </div>
+  </div>
+  <div class="qty-ctrl">
+    <button class="qty-btn remove" onclick="changeQty('${product.model}',-1)">−</button>
+    <div class="qty-val">${qty}</div>
+    <button class="qty-btn" onclick="changeQty('${product.model}',1)">+</button>
+  </div>
+</div>`;
+        });
+        container.innerHTML = html;
+        const feeTotal = wmahCount * INSTALL_FEE;
+        const costTotal = costSubtotal + feeTotal;
+        document.getElementById("val-cost").textContent =
+          "$" + costTotal.toFixed(2);
+        document.getElementById("val-retail").textContent =
+          "$" + retailSubtotal.toFixed(2);
+        const feeEl = document.getElementById("fee-note");
+        const costSub = document.getElementById("cost-sub");
+        if (wmahCount > 0) {
+          feeEl.textContent = `Includes ${wmahCount} air handler install fee${wmahCount > 1 ? "s" : ""} (+$${feeTotal.toFixed(2)})`;
+          feeEl.style.display = "block";
+          costSub.textContent = `Subtotal $${costSubtotal.toFixed(2)} + $${feeTotal.toFixed(2)} fee`;
+          costSub.style.display = "block";
+        } else {
+          feeEl.style.display = "none";
+          costSub.style.display = "none";
+        }
+        totalsEl.style.display = "block";
+      }
+
+      renderCatalog();
+      renderOrder();
+    </script>
+  </body>
+</html>
