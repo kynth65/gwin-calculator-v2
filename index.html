@@ -56,6 +56,26 @@
         gap: 8px;
         margin-bottom: 16px;
       }
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .filter-group-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        color: #9ca3af;
+        white-space: nowrap;
+        min-width: 38px;
+      }
+      .filter-divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 2px 0;
+      }
       .filter-chip {
         padding: 5px 13px;
         border-radius: 20px;
@@ -161,14 +181,17 @@
       .card-type.bundle {
         color: #7c3aed;
       }
-      .card-type.multi-zonecondener {
+      .card-type.multizonecondenser {
         color: #0891b2;
       }
-      .card-type.multi-zonewmah {
+      .card-type.multizonewmah {
         color: #059669;
       }
-      .card-type.multi-zoneslimcassette {
+      .card-type.slimcassette {
         color: #d97706;
+      }
+      .card-type.cassettepanel {
+        color: #be185d;
       }
       .card-model {
         font-size: 12px;
@@ -303,17 +326,21 @@
         background: #ede9fe;
         color: #5b21b6;
       }
-      .item-badge.multi-zonecondener {
+      .item-badge.multizonecondenser {
         background: #cffafe;
         color: #164e63;
       }
-      .item-badge.multi-zonewmah {
+      .item-badge.multizonewmah {
         background: #d1fae5;
         color: #065f46;
       }
-      .item-badge.multi-zoneslimcassette {
+      .item-badge.slimcassette {
         background: #fef3c7;
         color: #92400e;
+      }
+      .item-badge.cassettepanel {
+        background: #fce7f3;
+        color: #9d174d;
       }
       .item-prices {
         display: flex;
@@ -408,13 +435,42 @@
         padding: 10px 12px;
         border: 1px solid #e5e7eb;
       }
+      .total-col-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
       .total-col-label {
         font-size: 10px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.6px;
         color: #9ca3af;
-        margin-bottom: 4px;
+      }
+      .copy-btn {
+        background: none;
+        border: 1px solid #e5e7eb;
+        border-radius: 5px;
+        cursor: pointer;
+        padding: 2px 7px;
+        font-size: 10px;
+        font-weight: 500;
+        color: #9ca3af;
+        font-family: "Inter", sans-serif;
+        transition: all 0.15s;
+        line-height: 1.4;
+        flex-shrink: 0;
+      }
+      .copy-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+        background: #eff6ff;
+      }
+      .copy-btn.copied {
+        border-color: #059669;
+        color: #059669;
+        background: #f0fdf4;
       }
       .total-col-sub {
         font-size: 11px;
@@ -428,26 +484,6 @@
       }
       .total-col-main.retail-total {
         color: #2563eb;
-      }
-      .filter-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-      }
-      .filter-group-label {
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.7px;
-        text-transform: uppercase;
-        color: #9ca3af;
-        white-space: nowrap;
-        min-width: 38px;
-      }
-      .filter-divider {
-        height: 1px;
-        background: #e5e7eb;
-        margin: 2px 0;
       }
       .fee-note {
         font-size: 10px;
@@ -506,7 +542,10 @@
         <div class="order-totals" id="order-totals" style="display: none">
           <div class="totals-grid">
             <div class="total-col">
-              <div class="total-col-label">At Cost</div>
+              <div class="total-col-top">
+                <div class="total-col-label">At Cost</div>
+                <button class="copy-btn" id="copy-cost">Copy</button>
+              </div>
               <div
                 class="total-col-sub"
                 id="cost-sub"
@@ -515,7 +554,10 @@
               <div class="total-col-main" id="val-cost">$0.00</div>
             </div>
             <div class="total-col">
-              <div class="total-col-label">Retail</div>
+              <div class="total-col-top">
+                <div class="total-col-label">Retail</div>
+                <button class="copy-btn" id="copy-retail">Copy</button>
+              </div>
               <div class="total-col-main retail-total" id="val-retail">
                 $0.00
               </div>
@@ -952,13 +994,21 @@
           at_cost: 494.46,
           retail: 1137.26,
         },
+        // ── Cassette Panel ──
+        {
+          model: "GCT114",
+          unit_type: "Cassette Panel",
+          voltage: "N/A",
+          btu: "N/A",
+          at_cost: 70.03,
+          retail: 161.07,
+        },
       ];
 
       const INSTALL_FEE = 144;
       let order = {};
       let activeFilters = { series: "all", type: "all" };
 
-      // CSS class key for unit_type
       function typeClass(unit_type) {
         return unit_type.toLowerCase().replace(/[\s-]/g, "");
       }
@@ -998,20 +1048,26 @@
             label: "Multi-Zone — Slim Cassettes",
             f: (p) => p.unit_type === "Slim Cassette",
           },
+          {
+            label: "Cassette Panel",
+            f: (p) => p.unit_type === "Cassette Panel",
+          },
         ];
 
-        // Series filter helpers
         const seriesMatch = (p) => {
           if (activeFilters.series === "empr")
             return p.model.startsWith("EMPR");
           if (activeFilters.series === "king")
             return p.model.startsWith("KING");
           if (activeFilters.series === "multi")
-            return p.model.startsWith("GMULTI") || p.model.startsWith("GWIN");
+            return (
+              p.model.startsWith("GMULTI") ||
+              p.model.startsWith("GWIN") ||
+              p.model.startsWith("GCT")
+            );
           return true;
         };
 
-        // Type filter helpers
         const typeMatch = (p) => {
           if (activeFilters.type === "WMAH") return p.unit_type === "WMAH";
           if (activeFilters.type === "Condenser")
@@ -1022,6 +1078,8 @@
           if (activeFilters.type === "Bundle") return p.unit_type === "Bundle";
           if (activeFilters.type === "Cassette")
             return p.unit_type === "Slim Cassette";
+          if (activeFilters.type === "CassettePanel")
+            return p.unit_type === "Cassette Panel";
           return true;
         };
 
@@ -1041,6 +1099,7 @@
     <button class="filter-chip ${activeFilters.type === "Condenser" ? "active" : ""}" onclick="setFilter('type','Condenser')">Condensers</button>
     <button class="filter-chip ${activeFilters.type === "Bundle" ? "active" : ""}" onclick="setFilter('type','Bundle')">Bundles</button>
     <button class="filter-chip ${activeFilters.type === "Cassette" ? "active" : ""}" onclick="setFilter('type','Cassette')">Cassettes</button>
+    <button class="filter-chip ${activeFilters.type === "CassettePanel" ? "active" : ""}" onclick="setFilter('type','CassettePanel')">Cassette Panel</button>
   </div>
 </div>`;
 
@@ -1113,6 +1172,18 @@
         renderOrder();
       }
 
+      function copyVal(btnId, text) {
+        navigator.clipboard.writeText(text.replace("$", "")).then(() => {
+          const btn = document.getElementById(btnId);
+          btn.textContent = "Copied!";
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.textContent = "Copy";
+            btn.classList.remove("copied");
+          }, 1500);
+        });
+      }
+
       function renderOrder() {
         const container = document.getElementById("order-items");
         const totalsEl = document.getElementById("order-totals");
@@ -1129,7 +1200,6 @@
         items.forEach(({ product, qty }) => {
           costSubtotal += product.at_cost * qty;
           retailSubtotal += product.retail * qty;
-          // Air handlers and cassettes both carry the install fee logic for WMAH
           if (product.unit_type === "WMAH") wmahCount += qty;
           const tc = typeClass(product.unit_type);
           html += `<div class="order-item">
@@ -1149,12 +1219,15 @@
 </div>`;
         });
         container.innerHTML = html;
+
         const feeTotal = wmahCount * INSTALL_FEE;
         const costTotal = costSubtotal + feeTotal;
-        document.getElementById("val-cost").textContent =
-          "$" + costTotal.toFixed(2);
-        document.getElementById("val-retail").textContent =
-          "$" + retailSubtotal.toFixed(2);
+        const costStr = "$" + costTotal.toFixed(2);
+        const retailStr = "$" + retailSubtotal.toFixed(2);
+
+        document.getElementById("val-cost").textContent = costStr;
+        document.getElementById("val-retail").textContent = retailStr;
+
         const feeEl = document.getElementById("fee-note");
         const costSub = document.getElementById("cost-sub");
         if (wmahCount > 0) {
@@ -1166,6 +1239,12 @@
           feeEl.style.display = "none";
           costSub.style.display = "none";
         }
+
+        document.getElementById("copy-cost").onclick = () =>
+          copyVal("copy-cost", costStr);
+        document.getElementById("copy-retail").onclick = () =>
+          copyVal("copy-retail", retailStr);
+
         totalsEl.style.display = "block";
       }
 
