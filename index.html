@@ -52,8 +52,8 @@
       }
       .filter-bar {
         display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 8px;
         margin-bottom: 16px;
       }
       .filter-chip {
@@ -428,6 +428,26 @@
       }
       .total-col-main.retail-total {
         color: #2563eb;
+      }
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .filter-group-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        color: #9ca3af;
+        white-space: nowrap;
+        min-width: 38px;
+      }
+      .filter-divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 2px 0;
       }
       .fee-note {
         font-size: 10px;
@@ -1006,15 +1026,22 @@
         };
 
         let html = `<div class="filter-bar">
-  <button class="filter-chip ${activeFilters.series === "all" ? "active" : ""}" onclick="setFilter('series','all')">All Series</button>
-  <button class="filter-chip ${activeFilters.series === "empr" ? "active" : ""}" onclick="setFilter('series','empr')">Emperor</button>
-  <button class="filter-chip ${activeFilters.series === "king" ? "active" : ""}" onclick="setFilter('series','king')">King</button>
-  <button class="filter-chip ${activeFilters.series === "multi" ? "active" : ""}" onclick="setFilter('series','multi')">Multi-Zone</button>
-  <button class="filter-chip ${activeFilters.type === "all" ? "active" : ""}" onclick="setFilter('type','all')">All Types</button>
-  <button class="filter-chip ${activeFilters.type === "WMAH" ? "active" : ""}" onclick="setFilter('type','WMAH')">Air Handlers</button>
-  <button class="filter-chip ${activeFilters.type === "Condenser" ? "active" : ""}" onclick="setFilter('type','Condenser')">Condensers</button>
-  <button class="filter-chip ${activeFilters.type === "Bundle" ? "active" : ""}" onclick="setFilter('type','Bundle')">Bundles</button>
-  <button class="filter-chip ${activeFilters.type === "Cassette" ? "active" : ""}" onclick="setFilter('type','Cassette')">Cassettes</button>
+  <div class="filter-group">
+    <span class="filter-group-label">Series</span>
+    <button class="filter-chip ${activeFilters.series === "all" ? "active" : ""}" onclick="setFilter('series','all')">All</button>
+    <button class="filter-chip ${activeFilters.series === "empr" ? "active" : ""}" onclick="setFilter('series','empr')">Emperor</button>
+    <button class="filter-chip ${activeFilters.series === "king" ? "active" : ""}" onclick="setFilter('series','king')">King</button>
+    <button class="filter-chip ${activeFilters.series === "multi" ? "active" : ""}" onclick="setFilter('series','multi')">Multi-Zone</button>
+  </div>
+  <div class="filter-divider"></div>
+  <div class="filter-group">
+    <span class="filter-group-label">Type</span>
+    <button class="filter-chip ${activeFilters.type === "all" ? "active" : ""}" onclick="setFilter('type','all')">All</button>
+    <button class="filter-chip ${activeFilters.type === "WMAH" ? "active" : ""}" onclick="setFilter('type','WMAH')">Air Handlers</button>
+    <button class="filter-chip ${activeFilters.type === "Condenser" ? "active" : ""}" onclick="setFilter('type','Condenser')">Condensers</button>
+    <button class="filter-chip ${activeFilters.type === "Bundle" ? "active" : ""}" onclick="setFilter('type','Bundle')">Bundles</button>
+    <button class="filter-chip ${activeFilters.type === "Cassette" ? "active" : ""}" onclick="setFilter('type','Cassette')">Cassettes</button>
+  </div>
 </div>`;
 
         sections.forEach(({ label, f }) => {
