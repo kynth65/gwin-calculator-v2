@@ -187,7 +187,8 @@
       .card-type.multizonewmah {
         color: #059669;
       }
-      .card-type.slimcassette {
+      .card-type.slimcassette,
+      .card-type.multizонеslimcassette {
         color: #d97706;
       }
       .card-type.cassettepanel {
@@ -197,13 +198,14 @@
         font-size: 12px;
         font-weight: 500;
         color: #111;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         line-height: 1.4;
       }
       .card-meta {
         display: flex;
         gap: 5px;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
       }
       .badge {
         font-size: 10px;
@@ -213,12 +215,35 @@
         color: #6b7280;
         font-weight: 500;
       }
+      .zone-badge {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+      .zone-badge.single {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+      .zone-badge.multi {
+        background: #fce7f3;
+        color: #9d174d;
+      }
+      .sqft-badge {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: #ecfdf5;
+        color: #065f46;
+        font-weight: 600;
+      }
       .card-prices {
         display: flex;
         flex-direction: column;
         gap: 3px;
         border-top: 1px solid #f3f4f6;
         padding-top: 8px;
+        margin-top: 4px;
       }
       .price-row {
         display: flex;
@@ -506,11 +531,37 @@
         font-size: 12px;
         font-weight: 500;
         transition: all 0.15s;
+        margin-bottom: 10px;
       }
       .clear-btn:hover {
         border-color: #ef4444;
         color: #ef4444;
         background: #fff5f5;
+      }
+      .sqft-section {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+        padding: 12px 14px;
+      }
+      .sqft-title {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #059669;
+        margin-bottom: 4px;
+      }
+      .sqft-main {
+        font-size: 22px;
+        font-weight: 700;
+        color: #065f46;
+        line-height: 1.2;
+      }
+      .sqft-sub {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: 3px;
       }
       .catalog::-webkit-scrollbar,
       .order-items::-webkit-scrollbar {
@@ -565,15 +616,33 @@
           </div>
           <div class="fee-note" id="fee-note" style="display: none"></div>
           <button class="clear-btn" onclick="clearOrder()">Clear Order</button>
+          <div class="sqft-section" id="sqft-section" style="display: none">
+            <div class="sqft-title">📐 Total Coverage</div>
+            <div class="sqft-main" id="sqft-val">0 sq ft</div>
+            <div class="sqft-sub" id="sqft-sub"></div>
+          </div>
         </div>
       </div>
     </div>
     <script>
+      // BTU → sq ft lookup
+      const BTU_SQFT = {
+        "7k": 300,
+        "9k": 400,
+        "12k": 550,
+        "18k": 750,
+        "20k": 850,
+        "24k": 1000,
+        "30k": 1250,
+        "36k": 1500,
+      };
+
       const PRODUCTS = [
-        // ── Emperor Air Handlers ──
+        // ── Emperor Air Handlers (Single Zone) ──
         {
           model: "EMPR09HP115V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "115V",
           btu: "9k",
           at_cost: 260.0,
@@ -582,6 +651,7 @@
         {
           model: "EMPR09HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "9k",
           at_cost: 261.32,
@@ -590,6 +660,7 @@
         {
           model: "EMPR12HP115V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "115V",
           btu: "12k",
           at_cost: 264.0,
@@ -598,6 +669,7 @@
         {
           model: "EMPR12HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "12k",
           at_cost: 265.9,
@@ -606,6 +678,7 @@
         {
           model: "EMPR18HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "18k",
           at_cost: 361.3,
@@ -614,6 +687,7 @@
         {
           model: "EMPR24HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "24k",
           at_cost: 425.94,
@@ -623,6 +697,7 @@
         {
           model: "EMPR09HP115V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "115V",
           btu: "9k",
           at_cost: 1387.1,
@@ -631,6 +706,7 @@
         {
           model: "EMPR09HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "9k",
           at_cost: 1318.04,
@@ -639,6 +715,7 @@
         {
           model: "EMPR12HP115V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "115V",
           btu: "12k",
           at_cost: 1389.1,
@@ -647,6 +724,7 @@
         {
           model: "EMPR12HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "12k",
           at_cost: 1327.73,
@@ -655,6 +733,7 @@
         {
           model: "EMPR18HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "18k",
           at_cost: 1510.72,
@@ -663,15 +742,17 @@
         {
           model: "EMPR24HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "24k",
           at_cost: 1639.89,
           retail: 2733.05,
         },
-        // ── Emperor Bundles ──
+        // ── Emperor Bundles (Single Zone) ──
         {
           model: "EMPR09HP115V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "115V",
           btu: "9k",
           at_cost: 1819.0,
@@ -680,6 +761,7 @@
         {
           model: "EMPR09HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "9k",
           at_cost: 1751.26,
@@ -688,6 +770,7 @@
         {
           model: "EMPR12HP115V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "115V",
           btu: "12k",
           at_cost: 1825.0,
@@ -696,6 +779,7 @@
         {
           model: "EMPR12HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "12k",
           at_cost: 1765.53,
@@ -704,6 +788,7 @@
         {
           model: "EMPR18HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "18k",
           at_cost: 2046.62,
@@ -712,15 +797,17 @@
         {
           model: "EMPR24HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "24k",
           at_cost: 2245.23,
           retail: 4125.33,
         },
-        // ── King Air Handlers ──
+        // ── King Air Handlers (Single Zone) ──
         {
           model: "KING09HP115V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "115V",
           btu: "9k",
           at_cost: 182.58,
@@ -729,6 +816,7 @@
         {
           model: "KING09HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "9k",
           at_cost: 182.75,
@@ -737,6 +825,7 @@
         {
           model: "KING12HP115V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "115V",
           btu: "12k",
           at_cost: 196.6,
@@ -745,6 +834,7 @@
         {
           model: "KING12HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "12k",
           at_cost: 196.6,
@@ -753,6 +843,7 @@
         {
           model: "KING18HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "18k",
           at_cost: 283.18,
@@ -761,6 +852,7 @@
         {
           model: "KING24HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "24k",
           at_cost: 317.1,
@@ -769,6 +861,7 @@
         {
           model: "KING30HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "30k",
           at_cost: 508.29,
@@ -777,6 +870,7 @@
         {
           model: "KING36HP230V1R32AH",
           unit_type: "WMAH",
+          zone: "single",
           voltage: "230V",
           btu: "36k",
           at_cost: 540.14,
@@ -786,6 +880,7 @@
         {
           model: "KING09HP115V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "115V",
           btu: "9k",
           at_cost: 1182.76,
@@ -794,6 +889,7 @@
         {
           model: "KING09HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "9k",
           at_cost: 1160.88,
@@ -802,6 +898,7 @@
         {
           model: "KING12HP115V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "115V",
           btu: "12k",
           at_cost: 1027.07,
@@ -810,6 +907,7 @@
         {
           model: "KING12HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "12k",
           at_cost: 1184.92,
@@ -818,6 +916,7 @@
         {
           model: "KING18HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "18k",
           at_cost: 1355.71,
@@ -826,6 +925,7 @@
         {
           model: "KING24HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "24k",
           at_cost: 1417.68,
@@ -834,6 +934,7 @@
         {
           model: "KING30HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "30k",
           at_cost: 1751.08,
@@ -842,15 +943,17 @@
         {
           model: "KING36HP230V1R32AO",
           unit_type: "Condenser",
+          zone: "single",
           voltage: "230V",
           btu: "36k",
           at_cost: 1813.51,
           retail: 3132.37,
         },
-        // ── King Bundles ──
+        // ── King Bundles (Single Zone) ──
         {
           model: "KING09HP115V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "115V",
           btu: "9k",
           at_cost: 1537.24,
@@ -859,6 +962,7 @@
         {
           model: "KING09HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "9k",
           at_cost: 1222.6,
@@ -867,6 +971,7 @@
         {
           model: "KING12HP115V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "115V",
           btu: "12k",
           at_cost: 1395.57,
@@ -875,6 +980,7 @@
         {
           model: "KING12HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "12k",
           at_cost: 1553.42,
@@ -883,6 +989,7 @@
         {
           model: "KING18HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "18k",
           at_cost: 1813.49,
@@ -891,6 +998,7 @@
         {
           model: "KING24HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "24k",
           at_cost: 1914.18,
@@ -899,6 +1007,7 @@
         {
           model: "KING30HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "30k",
           at_cost: 2359.67,
@@ -907,6 +1016,7 @@
         {
           model: "KING36HP230V1R32AS",
           unit_type: "Bundle",
+          zone: "single",
           voltage: "230V",
           btu: "36k",
           at_cost: 2453.95,
@@ -916,6 +1026,7 @@
         {
           model: "GMULTI18HP230V1R32AO",
           unit_type: "Multi-Zone Condenser",
+          zone: "multi",
           voltage: "230V",
           btu: "18k",
           at_cost: 1628.54,
@@ -924,6 +1035,7 @@
         {
           model: "GMULTI24HP230V1R32AO",
           unit_type: "Multi-Zone Condenser",
+          zone: "multi",
           voltage: "230V",
           btu: "24k",
           at_cost: 2016.54,
@@ -932,6 +1044,7 @@
         {
           model: "GMULTI30HP230V1R32AO",
           unit_type: "Multi-Zone Condenser",
+          zone: "multi",
           voltage: "230V",
           btu: "30k",
           at_cost: 2062.42,
@@ -940,6 +1053,7 @@
         {
           model: "GMULTI36HP230V1R32AO",
           unit_type: "Multi-Zone Condenser",
+          zone: "multi",
           voltage: "230V",
           btu: "36k",
           at_cost: 2514.56,
@@ -948,6 +1062,7 @@
         {
           model: "GMULTI42HP230V1R32AO",
           unit_type: "Multi-Zone Condenser",
+          zone: "multi",
           voltage: "230V",
           btu: "42k",
           at_cost: 2619.41,
@@ -956,6 +1071,7 @@
         {
           model: "GMULTI48HP230V1R32AO",
           unit_type: "Multi-Zone Condenser",
+          zone: "multi",
           voltage: "230V",
           btu: "48k",
           at_cost: 2754.76,
@@ -964,15 +1080,118 @@
         {
           model: "GMULTI60HP230V1R32AO",
           unit_type: "Multi-Zone Condenser",
+          zone: "multi",
           voltage: "230V",
           btu: "60k",
           at_cost: 3198.46,
           retail: 6317.76,
         },
+        // ── Multi-Zone Air Handlers (King) ──
+        {
+          model: "KING07HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "7k",
+          at_cost: 155.32,
+          retail: 357.24,
+        },
+        {
+          model: "KING09HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 182.75,
+          retail: 420.33,
+        },
+        {
+          model: "KING12HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 196.6,
+          retail: 452.18,
+        },
+        {
+          model: "KING18HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 283.18,
+          retail: 651.31,
+        },
+        {
+          model: "KING24HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 317.1,
+          retail: 729.33,
+        },
+        {
+          model: "KING30HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "30k",
+          at_cost: 453.19,
+          retail: 1042.34,
+        },
+        {
+          model: "KING36HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "36k",
+          at_cost: 485.04,
+          retail: 1115.59,
+        },
+        // ── Multi-Zone Air Handlers (Emperor) ──
+        {
+          model: "EMPR09HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "9k",
+          at_cost: 261.32,
+          retail: 601.04,
+        },
+        {
+          model: "EMPR12HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "12k",
+          at_cost: 265.9,
+          retail: 611.57,
+        },
+        {
+          model: "EMPR18HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "18k",
+          at_cost: 361.3,
+          retail: 830.99,
+        },
+        {
+          model: "EMPR24HP230V1R32AH-MZ",
+          unit_type: "Multi-Zone WMAH",
+          zone: "multi",
+          voltage: "230V",
+          btu: "24k",
+          at_cost: 425.94,
+          retail: 979.66,
+        },
         // ── Multi-Zone Slim Cassettes ──
         {
           model: "GWIN09HP230V1R32AC",
           unit_type: "Slim Cassette",
+          zone: "multi",
           voltage: "230V",
           btu: "9k",
           at_cost: 465.4,
@@ -981,6 +1200,7 @@
         {
           model: "GWIN12HP230V1R32AC",
           unit_type: "Slim Cassette",
+          zone: "multi",
           voltage: "230V",
           btu: "12k",
           at_cost: 484.54,
@@ -989,6 +1209,7 @@
         {
           model: "GWIN20HP230V1R32AC",
           unit_type: "Slim Cassette",
+          zone: "multi",
           voltage: "230V",
           btu: "20k",
           at_cost: 494.46,
@@ -998,6 +1219,7 @@
         {
           model: "GCT114",
           unit_type: "Cassette Panel",
+          zone: null,
           voltage: "N/A",
           btu: "N/A",
           at_cost: 70.03,
@@ -1011,6 +1233,18 @@
 
       function typeClass(unit_type) {
         return unit_type.toLowerCase().replace(/[\s-]/g, "");
+      }
+
+      function getSqft(p) {
+        // Air handlers and bundles both include an air handler → count sq ft
+        if (
+          p.unit_type === "WMAH" ||
+          p.unit_type === "Multi-Zone WMAH" ||
+          p.unit_type === "Bundle"
+        ) {
+          return BTU_SQFT[p.btu] || 0;
+        }
+        return 0;
       }
 
       function renderCatalog() {
@@ -1045,6 +1279,16 @@
             f: (p) => p.unit_type === "Multi-Zone Condenser",
           },
           {
+            label: "Multi-Zone — Air Handlers (King)",
+            f: (p) =>
+              p.unit_type === "Multi-Zone WMAH" && p.model.startsWith("KING"),
+          },
+          {
+            label: "Multi-Zone — Air Handlers (Emperor)",
+            f: (p) =>
+              p.unit_type === "Multi-Zone WMAH" && p.model.startsWith("EMPR"),
+          },
+          {
             label: "Multi-Zone — Slim Cassettes",
             f: (p) => p.unit_type === "Slim Cassette",
           },
@@ -1058,18 +1302,19 @@
           if (activeFilters.series === "empr")
             return p.model.startsWith("EMPR");
           if (activeFilters.series === "king")
-            return p.model.startsWith("KING");
-          if (activeFilters.series === "multi")
             return (
+              p.model.startsWith("KING") ||
               p.model.startsWith("GMULTI") ||
               p.model.startsWith("GWIN") ||
               p.model.startsWith("GCT")
             );
+          if (activeFilters.series === "multi") return p.zone === "multi";
           return true;
         };
 
         const typeMatch = (p) => {
-          if (activeFilters.type === "WMAH") return p.unit_type === "WMAH";
+          if (activeFilters.type === "WMAH")
+            return p.unit_type === "WMAH" || p.unit_type === "Multi-Zone WMAH";
           if (activeFilters.type === "Condenser")
             return (
               p.unit_type === "Condenser" ||
@@ -1080,6 +1325,8 @@
             return p.unit_type === "Slim Cassette";
           if (activeFilters.type === "CassettePanel")
             return p.unit_type === "Cassette Panel";
+          if (activeFilters.type === "MultiZoneWMAH")
+            return p.unit_type === "Multi-Zone WMAH";
           return true;
         };
 
@@ -1096,6 +1343,7 @@
     <span class="filter-group-label">Type</span>
     <button class="filter-chip ${activeFilters.type === "all" ? "active" : ""}" onclick="setFilter('type','all')">All</button>
     <button class="filter-chip ${activeFilters.type === "WMAH" ? "active" : ""}" onclick="setFilter('type','WMAH')">Air Handlers</button>
+    <button class="filter-chip ${activeFilters.type === "MultiZoneWMAH" ? "active" : ""}" onclick="setFilter('type','MultiZoneWMAH')">Multi-Zone AH</button>
     <button class="filter-chip ${activeFilters.type === "Condenser" ? "active" : ""}" onclick="setFilter('type','Condenser')">Condensers</button>
     <button class="filter-chip ${activeFilters.type === "Bundle" ? "active" : ""}" onclick="setFilter('type','Bundle')">Bundles</button>
     <button class="filter-chip ${activeFilters.type === "Cassette" ? "active" : ""}" onclick="setFilter('type','Cassette')">Cassettes</button>
@@ -1112,10 +1360,22 @@
           products.forEach((p) => {
             const qty = order[p.model] ? order[p.model].qty : 0;
             const tc = typeClass(p.unit_type);
+            const sqft = getSqft(p);
+            const zoneBadge =
+              p.zone === "single" ?
+                `<span class="zone-badge single">Single Zone</span>`
+              : p.zone === "multi" ?
+                `<span class="zone-badge multi">Multi-Zone</span>`
+              : "";
+            const sqftBadge =
+              sqft > 0 ?
+                `<span class="sqft-badge">~${sqft.toLocaleString()} sq ft</span>`
+              : "";
             html += `<div class="product-card ${qty > 0 ? "added" : ""}" data-model="${p.model}" data-count="${qty > 0 ? qty : ""}" onclick="addToOrder('${p.model}',event)">
   <div class="card-type ${tc}">${p.unit_type}</div>
   <div class="card-model">${p.model}</div>
-  <div class="card-meta"><span class="badge">${p.btu}</span><span class="badge">${p.voltage}</span></div>
+  <div class="card-meta"><span class="badge">${p.btu}</span><span class="badge">${p.voltage}</span>${zoneBadge}</div>
+  ${sqftBadge ? `<div style="margin-bottom:4px">${sqftBadge}</div>` : ""}
   <div class="card-prices">
     <div class="price-row"><span class="price-label">At Cost</span><span class="price-cost">$${p.at_cost.toFixed(2)}</span></div>
     <div class="price-row"><span class="price-label">Retail</span><span class="price-retail">$${p.retail.toFixed(2)}</span></div>
@@ -1196,11 +1456,34 @@
         let costSubtotal = 0,
           retailSubtotal = 0,
           wmahCount = 0,
+          totalSqft = 0,
+          sqftBreakdown = [],
+          bundleCondenserCount = 0,
           html = "";
         items.forEach(({ product, qty }) => {
           costSubtotal += product.at_cost * qty;
           retailSubtotal += product.retail * qty;
-          if (product.unit_type === "WMAH") wmahCount += qty;
+
+          // Add $799 for each Bundle or Condenser
+          if (
+            product.unit_type === "Bundle" ||
+            product.unit_type === "Condenser" ||
+            product.unit_type === "Multi-Zone Condenser"
+          ) {
+            bundleCondenserCount += qty;
+          }
+          if (
+            product.unit_type === "WMAH" ||
+            product.unit_type === "Multi-Zone WMAH"
+          )
+            wmahCount += qty;
+          const sqft = getSqft(product);
+          if (sqft > 0) {
+            totalSqft += sqft * qty;
+            sqftBreakdown.push(
+              `${qty > 1 ? qty + "×" : ""}${product.btu} (${(sqft * qty).toLocaleString()} sq ft)`,
+            );
+          }
           const tc = typeClass(product.unit_type);
           html += `<div class="order-item">
   <div class="item-info">
@@ -1223,18 +1506,35 @@
         const feeTotal = wmahCount * INSTALL_FEE;
         const costTotal = costSubtotal + feeTotal;
         const costStr = "$" + costTotal.toFixed(2);
-        const retailStr = "$" + retailSubtotal.toFixed(2);
+        const extraRetail = bundleCondenserCount * 799;
+        const retailTotal = retailSubtotal + extraRetail;
+        const retailStr = "$" + retailTotal.toFixed(2);
 
         document.getElementById("val-cost").textContent = costStr;
         document.getElementById("val-retail").textContent = retailStr;
 
         const feeEl = document.getElementById("fee-note");
         const costSub = document.getElementById("cost-sub");
-        if (wmahCount > 0) {
-          feeEl.textContent = `Includes ${wmahCount} air handler install fee${wmahCount > 1 ? "s" : ""} (+$${feeTotal.toFixed(2)})`;
+
+        if (wmahCount > 0 || bundleCondenserCount > 0) {
+          let feeText = "";
+
+          // Air handler install fee
+          if (wmahCount > 0) {
+            feeText += `Includes ${wmahCount} air handler install fee${wmahCount > 1 ? "s" : ""} (+$${feeTotal.toFixed(2)})`;
+          }
+
+          // Bundle / condenser fee
+          if (bundleCondenserCount > 0) {
+            if (feeText) feeText += " | ";
+            feeText += `Includes ${bundleCondenserCount} bundle/condenser fee${bundleCondenserCount > 1 ? "s" : ""} (+$${extraRetail.toFixed(2)})`;
+          }
+
+          feeEl.textContent = feeText;
           feeEl.style.display = "block";
+
           costSub.textContent = `Subtotal $${costSubtotal.toFixed(2)} + $${feeTotal.toFixed(2)} fee`;
-          costSub.style.display = "block";
+          costSub.style.display = wmahCount > 0 ? "block" : "none";
         } else {
           feeEl.style.display = "none";
           costSub.style.display = "none";
@@ -1244,6 +1544,18 @@
           copyVal("copy-cost", costStr);
         document.getElementById("copy-retail").onclick = () =>
           copyVal("copy-retail", retailStr);
+
+        // Sq ft section
+        const sqftSection = document.getElementById("sqft-section");
+        if (totalSqft > 0) {
+          document.getElementById("sqft-val").textContent =
+            totalSqft.toLocaleString() + " sq ft";
+          document.getElementById("sqft-sub").textContent =
+            sqftBreakdown.join(" + ");
+          sqftSection.style.display = "block";
+        } else {
+          sqftSection.style.display = "none";
+        }
 
         totalsEl.style.display = "block";
       }
