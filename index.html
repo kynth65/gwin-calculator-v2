@@ -42,7 +42,7 @@
       }
       .app {
         display: grid;
-        grid-template-columns: 1fr 360px;
+        grid-template-columns: 1fr 420px;
         height: calc(100vh - 57px);
       }
       .catalog {
@@ -542,7 +542,15 @@
         background: #f0fdf4;
         border: 1px solid #bbf7d0;
         border-radius: 8px;
-        padding: 12px 14px;
+        overflow: hidden;
+      }
+      .sqft-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        cursor: pointer;
+        user-select: none;
       }
       .sqft-title {
         font-size: 10px;
@@ -550,7 +558,21 @@
         text-transform: uppercase;
         letter-spacing: 0.6px;
         color: #059669;
-        margin-bottom: 4px;
+      }
+      .sqft-arrow {
+        font-size: 10px;
+        color: #059669;
+        transition: transform 0.2s;
+      }
+      .sqft-arrow.open {
+        transform: rotate(180deg);
+      }
+      .sqft-body {
+        padding: 0 14px 12px;
+        display: none;
+      }
+      .sqft-body.open {
+        display: block;
       }
       .sqft-main {
         font-size: 22px;
@@ -617,9 +639,14 @@
           <div class="fee-note" id="fee-note" style="display: none"></div>
           <button class="clear-btn" onclick="clearOrder()">Clear Order</button>
           <div class="sqft-section" id="sqft-section" style="display: none">
-            <div class="sqft-title">📐 Total Coverage</div>
-            <div class="sqft-main" id="sqft-val">0 sq ft</div>
-            <div class="sqft-sub" id="sqft-sub"></div>
+            <div class="sqft-toggle" onclick="toggleSqft()">
+              <div class="sqft-title">📐 Total Coverage</div>
+              <span class="sqft-arrow" id="sqft-arrow">▲</span>
+            </div>
+            <div class="sqft-body" id="sqft-body">
+              <div class="sqft-main" id="sqft-val">0 sq ft</div>
+              <div class="sqft-sub" id="sqft-sub"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1458,20 +1485,11 @@
           wmahCount = 0,
           totalSqft = 0,
           sqftBreakdown = [],
-          bundleCondenserCount = 0,
           html = "";
         items.forEach(({ product, qty }) => {
           costSubtotal += product.at_cost * qty;
           retailSubtotal += product.retail * qty;
 
-          // Add $799 for each Bundle or Condenser
-          if (
-            product.unit_type === "Bundle" ||
-            product.unit_type === "Condenser" ||
-            product.unit_type === "Multi-Zone Condenser"
-          ) {
-            bundleCondenserCount += qty;
-          }
           if (
             product.unit_type === "WMAH" ||
             product.unit_type === "Multi-Zone WMAH"
@@ -1506,9 +1524,7 @@
         const feeTotal = wmahCount * INSTALL_FEE;
         const costTotal = costSubtotal + feeTotal;
         const costStr = "$" + costTotal.toFixed(2);
-        const extraRetail = bundleCondenserCount * 799;
-        const retailTotal = retailSubtotal + extraRetail;
-        const retailStr = "$" + retailTotal.toFixed(2);
+        const retailStr = "$" + retailSubtotal.toFixed(2);
 
         document.getElementById("val-cost").textContent = costStr;
         document.getElementById("val-retail").textContent = retailStr;
@@ -1516,20 +1532,8 @@
         const feeEl = document.getElementById("fee-note");
         const costSub = document.getElementById("cost-sub");
 
-        if (wmahCount > 0 || bundleCondenserCount > 0) {
-          let feeText = "";
-
-          // Air handler install fee
-          if (wmahCount > 0) {
-            feeText += `Includes ${wmahCount} air handler install fee${wmahCount > 1 ? "s" : ""} (+$${feeTotal.toFixed(2)})`;
-          }
-
-          // Bundle / condenser fee
-          if (bundleCondenserCount > 0) {
-            if (feeText) feeText += " | ";
-            feeText += `Includes ${bundleCondenserCount} bundle/condenser fee${bundleCondenserCount > 1 ? "s" : ""} (+$${extraRetail.toFixed(2)})`;
-          }
-
+        if (wmahCount > 0) {
+          const feeText = `Includes ${wmahCount} air handler install fee${wmahCount > 1 ? "s" : ""} (+$${feeTotal.toFixed(2)})`;
           feeEl.textContent = feeText;
           feeEl.style.display = "block";
 
@@ -1558,6 +1562,13 @@
         }
 
         totalsEl.style.display = "block";
+      }
+
+      function toggleSqft() {
+        const body = document.getElementById("sqft-body");
+        const arrow = document.getElementById("sqft-arrow");
+        const open = body.classList.toggle("open");
+        arrow.classList.toggle("open", open);
       }
 
       renderCatalog();
