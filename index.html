@@ -450,7 +450,7 @@
       }
       .totals-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 6px;
         margin-bottom: 12px;
       }
@@ -634,6 +634,13 @@
               <div class="total-col-main retail-total" id="val-retail">
                 $0.00
               </div>
+            </div>
+            <div class="total-col">
+              <div class="total-col-top">
+                <div class="total-col-label">Compare at Cost</div>
+                <button class="copy-btn" id="copy-compare">Copy</button>
+              </div>
+              <div class="total-col-main" id="val-compare">$0.00</div>
             </div>
           </div>
           <div class="fee-note" id="fee-note" style="display: none"></div>
@@ -1525,9 +1532,11 @@
         const costTotal = costSubtotal + feeTotal;
         const costStr = "$" + costTotal.toFixed(2);
         const retailStr = "$" + retailSubtotal.toFixed(2);
+        const compareStr = "$" + (retailSubtotal * 1.2).toFixed(2);
 
         document.getElementById("val-cost").textContent = costStr;
         document.getElementById("val-retail").textContent = retailStr;
+        document.getElementById("val-compare").textContent = compareStr;
 
         const feeEl = document.getElementById("fee-note");
         const costSub = document.getElementById("cost-sub");
@@ -1548,6 +1557,8 @@
           copyVal("copy-cost", costStr);
         document.getElementById("copy-retail").onclick = () =>
           copyVal("copy-retail", retailStr);
+        document.getElementById("copy-compare").onclick = () =>
+          copyVal("copy-compare", compareStr);
 
         // Sq ft section
         const sqftSection = document.getElementById("sqft-section");
